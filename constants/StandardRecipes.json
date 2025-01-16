@@ -1,0 +1,58 @@
+{
+    "recipes": [
+        {
+            "id": "pancakes",
+            "name": "Pancakes",
+            "ingredients": ["flour", "eggs", "milk", "sugar", "butter"],
+            "instructions": "Mix all ingredients and cook on a hot griddle."
+        },
+        {
+            "id": "spaghetti", 
+            "name": "Spaghetti",
+            "ingredients": ["spaghetti pasta", "ground turkey or beef", "tomato sauce", "onion", "garlic", "olive oil", "parmesan cheese"],
+            "instructions": "Boil pasta. Brown meat with onion and garlic. Add sauce and simmer. Combine and top with cheese."
+        },
+        {
+            "id": "tacos",
+            "name": "Tacos", 
+            "ingredients": ["ground beef", "taco shells", "lettuce", "tomato", "cheese", "taco seasoning", "sour cream"],
+            "instructions": "Brown meat with seasoning. Warm shells. Assemble with toppings."
+        },
+        {
+            "id": "pizza",
+            "name": "Pizza",
+            "ingredients": ["pizza dough", "tomato sauce", "mozzarella cheese", "pepperoni", "olive oil", "italian herbs"],
+            "instructions": "Stretch dough, add sauce and toppings. Bake at 450°F until crust is golden."
+        }
+    ],
+    "kitchenRecipes": [
+        {
+            "id": "pancakes",
+            "name": "Pancakes",
+            "ingredients": ["flour", "eggs", "milk", "sugar", "butter"],
+            "instructions": "Mix all ingredients and cook on a hot griddle.",
+            "checked": false
+        },
+        {
+            "id": "spaghetti",
+            "name": "Spaghetti", 
+            "ingredients": ["spaghetti pasta", "ground turkey or beef", "tomato sauce", "onion", "garlic", "olive oil", "parmesan cheese"],
+            "instructions": "Boil pasta. Brown meat with onion and garlic. Add sauce and simmer. Combine and top with cheese.",
+            "checked": false
+        },
+        {
+            "id": "tacos",
+            "name": "Tacos",
+            "ingredients": ["ground beef", "taco shells", "lettuce", "tomato", "cheese", "taco seasoning", "sour cream"],
+            "instructions": "Brown meat with seasoning. Warm shells. Assemble with toppings.",
+            "checked": false
+        },
+        {
+            "id": "pizza",
+            "name": "Pizza",
+            "ingredients": ["pizza dough", "tomato sauce", "mozzarella cheese", "pepperoni", "olive oil", "italian herbs"],
+            "instructions": "Stretch dough, add sauce and toppings. Bake at 450°F until crust is golden.",
+            "checked": false
+        }
+    ]
+}
