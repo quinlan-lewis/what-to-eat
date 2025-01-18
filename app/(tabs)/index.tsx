@@ -4,6 +4,7 @@ import { KitchenContext } from './_layout';
 import { RecipePage } from '@/components/ui/RecipePage';
 import { IngredientListModal } from '@/components/ui/IngredientListModal';
 import { UpdateKitchenPage } from '@/components/ui/UpdateKitchenPage';
+import { theme } from '@/constants/theme';
 
 export default function MyKitchen() {
     const { kitchenRecipes, setKitchenRecipes } = useContext(KitchenContext);
@@ -50,22 +51,31 @@ export default function MyKitchen() {
                     <ScrollView>
                         {kitchenRecipes.map((recipe: any) => (
                             <React.Fragment key={recipe.id}>
-                                <View style={styles.recipeRow}>
-                                    <Pressable
-                                        onPress={() => toggleRecipeChecked(recipe.id)}
-                                        style={styles.checkbox}>
-                                        {recipe.checked ? <Text>✓</Text> : null}
-                                    </Pressable>
-                                    <Text
-                                        style={[
-                                            styles.listItem,
-                                            { color: '#007AFF' },
-                                            recipe.checked && styles.checkedText
-                                        ]}
-                                        onPress={() => setVisibleRecipeId(recipe.id)}>
-                                        • {recipe.name}
-                                    </Text>
-                                </View>
+                                <TouchableOpacity 
+                                    style={[
+                                        styles.recipeCard,
+                                        recipe.checked && styles.checkedCard
+                                    ]}
+                                    onPress={() => setVisibleRecipeId(recipe.id)}
+                                >
+                                    <View style={styles.recipeRow}>
+                                        <Pressable
+                                            onPress={(e) => {
+                                                e.stopPropagation();
+                                                toggleRecipeChecked(recipe.id);
+                                            }}
+                                            style={styles.checkbox}>
+                                            {recipe.checked ? <Text>✓</Text> : null}
+                                        </Pressable>
+                                        <Text
+                                            style={[
+                                                styles.recipeName,
+                                                recipe.checked && styles.checkedText
+                                            ]}>
+                                            {recipe.name}
+                                        </Text>
+                                    </View>
+                                </TouchableOpacity>
                                 <RecipePage
                                     recipe={recipe}
                                     visible={visibleRecipeId === recipe.id}
@@ -86,6 +96,9 @@ export default function MyKitchen() {
                     onClose={() => setShowIngredients(false)}
                     recipes={kitchenRecipes}
                 />
+
+                <Text style={{ fontFamily: 'Satisfy' }}>Testing Satisfy Font</Text>
+                <Text style={{ fontFamily: 'Lora' }}>Testing Lora Font</Text>
             </View>
         </SafeAreaView>
     );
@@ -94,42 +107,43 @@ export default function MyKitchen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: theme.colors.paper,
     },
     innerContainer: {
         flex: 1,
         padding: 20,
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: 'black',
+        fontSize: 32,
+        fontFamily: theme.fonts.script,
+        color: theme.colors.ink,
         marginBottom: 20,
         textAlign: 'center',
     },
     recipeRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 10,
     },
     checkbox: {
         width: 24,
         height: 24,
         borderWidth: 1,
-        borderColor: '#007AFF',
-        borderRadius: 4,
-        marginRight: 10,
+        borderColor: theme.colors.accent,
+        borderRadius: theme.borderRadius.sm,
+        marginRight: theme.spacing.md,
         alignItems: 'center',
         justifyContent: 'center',
+        backgroundColor: theme.colors.paper,
+    },
+    recipeName: {
+        fontSize: 18,
+        fontFamily: theme.fonts.script,
+        color: theme.colors.ink,
+        flex: 1,
     },
     checkedText: {
         textDecorationLine: 'line-through',
-        opacity: 0.5,
-    },
-    listItem: {
-        fontSize: 18,
-        color: 'black',
-        flex: 1,
+        opacity: 0.6,
     },
     scrollContainer: {
         flex: 1,
@@ -147,17 +161,33 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         alignItems: 'center',
         justifyContent: 'center',
+        elevation: 2,
+        shadowColor: theme.colors.ink,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
     updateButton: {
-        backgroundColor: '#007AFF',
+        backgroundColor: theme.colors.accent,
     },
     ingredientsButton: {
-        backgroundColor: '#007AFF',
+        backgroundColor: theme.colors.secondary,
     },
     buttonText: {
-        color: 'white',
+        color: theme.colors.paper,
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: theme.fonts.script,
         textAlign: 'center',
+    },
+    recipeCard: {
+        backgroundColor: theme.colors.paperDark,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.md,
+        marginBottom: theme.spacing.sm,
+        ...theme.shadows.small,
+    },
+    checkedCard: {
+        backgroundColor: theme.colors.subtle,
+        opacity: 0.8,
     },
 });

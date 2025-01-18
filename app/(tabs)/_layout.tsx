@@ -10,6 +10,7 @@ import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import StandardRecipes from '@/constants/StandardRecipes.json';
+import { theme } from '@/constants/theme';
 
 // Overall context for all recipes
 export const RecipesContext = React.createContext<{
@@ -72,17 +73,26 @@ export default function TabLayout() {
       <KitchenContext.Provider value={{ kitchenRecipes, setKitchenRecipes }}>
         <Tabs
           screenOptions={{
-            tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+            tabBarActiveTintColor: theme.colors.accent,
+            tabBarInactiveTintColor: theme.colors.secondary,
             headerShown: false,
             tabBarButton: HapticTab,
             tabBarBackground: TabBarBackground,
-            tabBarStyle: Platform.select({
-              ios: {
-                // Use a transparent background on iOS to show the blur effect
-                position: 'absolute',
-              },
-              default: {},
-            }),
+            tabBarStyle: {
+              ...Platform.select({
+                ios: {
+                  position: 'absolute',
+                },
+                default: {},
+              }),
+              backgroundColor: theme.colors.paperDark,
+              borderTopColor: theme.colors.border,
+              ...theme.shadows.small,
+            },
+            tabBarLabelStyle: {
+              fontFamily: theme.fonts.regular,
+              fontSize: 12,
+            },
           }}>
           <Tabs.Screen
             name="index"

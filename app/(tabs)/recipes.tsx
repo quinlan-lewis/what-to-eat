@@ -5,6 +5,7 @@ import { RecipePage } from '@/components/ui/RecipePage';
 import { AddRecipePage } from '@/components/ui/AddRecipePage';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { theme } from '@/constants/theme';
 
 // // buttons for testing
 // function RecipeButtons() {
@@ -70,24 +71,29 @@ export default function MyRecipes() {
                         style={styles.addButton}
                         onPress={() => setAddRecipeVisible(true)}
                     >
-                        <IconSymbol name="plus" size={24} color="#007AFF" />
+                        <IconSymbol name="plus" size={24} color={theme.colors.paper} />
                     </TouchableOpacity>
                 </View>
 
-                <SearchBar
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                />
+                <View style={styles.searchContainer}>
+                    <SearchBar
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                    />
+                </View>
                 {/* <RecipeButtons /> */}
                 <View style={styles.scrollContainer}>
                     <ScrollView>
                         {filteredRecipes.map((recipe: any) => (
                             <React.Fragment key={recipe.id}>
-                                <Text
-                                    style={[styles.listItem, { color: '#007AFF' }]}
-                                    onPress={() => setVisibleRecipeId(recipe.id)}>
-                                    • {recipe.name}
-                                </Text>
+                                <TouchableOpacity 
+                                    style={styles.recipeCard}
+                                    onPress={() => setVisibleRecipeId(recipe.id)}
+                                >
+                                    <Text style={styles.recipeName}>
+                                        {recipe.name}
+                                    </Text>
+                                </TouchableOpacity>
                                 <RecipePage
                                     recipe={recipe}
                                     visible={visibleRecipeId === recipe.id}
@@ -111,11 +117,11 @@ export default function MyRecipes() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: theme.colors.paper,
     },
     innerContainer: {
         flex: 1,
-        padding: 20,
+        padding: theme.spacing.md,
     },
     header: {
         flexDirection: 'row',
@@ -124,12 +130,36 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: 'black',
+        fontSize: 32,
+        fontFamily: theme.fonts.script,
+        color: theme.colors.ink,
+        marginBottom: theme.spacing.lg,
+        textAlign: 'center',
+    },
+    searchContainer: {
+        backgroundColor: theme.colors.paperDark,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.sm,
+        marginBottom: theme.spacing.md,
+        ...theme.shadows.small,
+    },
+    searchInput: {
+        fontFamily: theme.fonts.regular,
+        fontSize: 16,
+        color: theme.colors.ink,
     },
     addButton: {
-        padding: 8,
+        backgroundColor: theme.colors.accent,
+        padding: theme.spacing.md,
+        borderRadius: theme.borderRadius.md,
+        alignItems: 'center',
+        marginBottom: theme.spacing.md,
+        ...theme.shadows.small,
+    },
+    addButtonText: {
+        color: theme.colors.paper,
+        fontFamily: theme.fonts.script,
+        fontSize: 18,
     },
     listItem: {
         fontSize: 18,
@@ -143,5 +173,23 @@ const styles = StyleSheet.create({
     scrollContainer: {
         flex: 1,
         marginBottom: 10,
+    },
+    recipeCard: {
+        backgroundColor: theme.colors.paperDark,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.md,
+        marginBottom: theme.spacing.sm,
+        ...theme.shadows.small,
+    },
+    recipeName: {
+        fontSize: 18,
+        fontFamily: theme.fonts.script,
+        color: theme.colors.ink,
+    },
+    recipeDescription: {
+        fontFamily: theme.fonts.regular,
+        fontSize: 14,
+        color: theme.colors.ink,
+        opacity: 0.8,
     },
 });

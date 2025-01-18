@@ -11,6 +11,7 @@ import {
     Button
 } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
+import { theme } from '@/constants/theme';
 
 type AddRecipePageProps = {
     visible: boolean;
@@ -61,11 +62,11 @@ export const AddRecipePage: React.FC<AddRecipePageProps> = ({ visible, onClose, 
             visible={visible}
             onRequestClose={onClose}
         >
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={styles.modalContainer}>
                 <View style={styles.innerContainer}>
                     <View style={styles.header}>
                         <TouchableOpacity onPress={onClose}>
-                            <IconSymbol name="chevron.left" size={24} color="black" />
+                            <IconSymbol name="chevron.left" size={24} color={theme.colors.ink} />
                         </TouchableOpacity>
                         <Text style={styles.title}>Add New Recipe</Text>
                     </View>
@@ -134,94 +135,104 @@ export const AddRecipePage: React.FC<AddRecipePageProps> = ({ visible, onClose, 
 };
 
 const styles = StyleSheet.create({
-    container: {
+    modalContainer: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: theme.colors.paper,
+        padding: theme.spacing.md,
     },
     innerContainer: {
         flex: 1,
-        padding: 20,
+        padding: theme.spacing.md,
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: theme.spacing.lg,
         position: 'relative',
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: 'black',
-        position: 'absolute',
-        left: 0,
-        right: 0,
+        fontSize: 28,
+        fontFamily: theme.fonts.script,
+        color: theme.colors.ink,
+        marginBottom: theme.spacing.lg,
         textAlign: 'center',
-        zIndex: -1,
     },
     scrollContainer: {
         flex: 1,
     },
     section: {
-        marginBottom: 24,
+        marginBottom: theme.spacing.xl,
     },
     sectionTitle: {
         fontSize: 20,
-        fontWeight: 'bold',
-        color: 'black',
-        marginBottom: 12,
+        fontFamily: theme.fonts.script,
+        color: theme.colors.ink,
+        marginBottom: theme.spacing.sm,
     },
     input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 16,
+        backgroundColor: theme.colors.paperDark,
+        padding: theme.spacing.md,
+        borderRadius: theme.borderRadius.md,
+        marginBottom: theme.spacing.md,
+        fontFamily: theme.fonts.regular,
+        color: theme.colors.ink,
+        ...theme.shadows.small,
     },
     ingredientInput: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 8,
-        marginBottom: 8,
+        gap: theme.spacing.sm,
+        marginBottom: theme.spacing.sm,
     },
     addButton: {
-        backgroundColor: '#007AFF',
-        padding: 12,
-        borderRadius: 8,
+        backgroundColor: theme.colors.accent,
+        padding: theme.spacing.md,
+        borderRadius: theme.borderRadius.md,
+        ...theme.shadows.small,
     },
     addButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
+        color: theme.colors.paper,
+        fontFamily: theme.fonts.script,
+        fontSize: 16,
     },
     ingredientItem: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingVertical: 8,
+        paddingVertical: theme.spacing.sm,
+        backgroundColor: theme.colors.subtle,
+        padding: theme.spacing.sm,
+        borderRadius: theme.borderRadius.sm,
+        marginBottom: theme.spacing.xs,
     },
     listItem: {
         fontSize: 16,
-        color: 'black',
+        fontFamily: theme.fonts.regular,
+        color: theme.colors.ink,
         flex: 1,
     },
     removeText: {
-        color: '#FF3B30',
+        color: theme.colors.error,
+        fontFamily: theme.fonts.regular,
         fontSize: 14,
+        paddingHorizontal: theme.spacing.sm,
     },
     instructionsInput: {
         height: 120,
         textAlignVertical: 'top',
     },
     saveButton: {
-        backgroundColor: '#007AFF',
-        padding: 16,
-        borderRadius: 8,
+        backgroundColor: theme.colors.accent,
+        padding: theme.spacing.md,
+        borderRadius: theme.borderRadius.md,
         alignItems: 'center',
-        marginTop: 20,
-        marginBottom: 40,
+        marginTop: theme.spacing.lg,
+        marginBottom: theme.spacing.xl,
+        ...theme.shadows.medium,
     },
     saveButtonText: {
-        color: 'white',
+        color: theme.colors.paper,
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: theme.fonts.script,
     },
 });
