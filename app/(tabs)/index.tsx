@@ -5,6 +5,7 @@ import { RecipePage } from '@/components/ui/RecipePage';
 import { IngredientListModal } from '@/components/ui/IngredientListModal';
 import { UpdateKitchenPage } from '@/components/ui/UpdateKitchenPage';
 
+// TODO: add columns for breakfast, lunch, dinner, and snacks
 export default function MyKitchen() {
     const { kitchenRecipes, setKitchenRecipes } = useContext(KitchenContext);
     const [visibleRecipeId, setVisibleRecipeId] = useState<string | null>(null);
