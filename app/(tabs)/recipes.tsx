@@ -1,11 +1,15 @@
 import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
-import { RecipesContext } from './_layout';
+import { RecipesContext, KitchenContext } from './_layout';
 import { RecipePage } from '@/components/ui/RecipePage';
 import { AddRecipePage } from '@/components/ui/AddRecipePage';
 import { SearchBar } from '@/components/ui/SearchBar';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { theme } from '@/constants/theme';
+import { Recipe } from '../../types/Recipe';
+import { RecipeModal } from '../../components/ui/RecipeModal';
+import { Swipeable } from 'react-native-gesture-handler';
+import { MaterialIcons } from '@expo/vector-icons';
 
 // // buttons for testing
 // function RecipeButtons() {
@@ -46,9 +50,11 @@ import { theme } from '@/constants/theme';
 
 export default function MyRecipes() {
     const { recipes, setRecipes } = useContext(RecipesContext);
+    const { kitchenRecipes, setKitchenRecipes } = useContext(KitchenContext);
     const [searchQuery, setSearchQuery] = useState('');
     const [isAddRecipeVisible, setAddRecipeVisible] = useState(false);
     const [visibleRecipeId, setVisibleRecipeId] = useState<string | null>(null);
+    const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
     const handleSaveRecipe = (newRecipe: any) => {
         setRecipes([...recipes, {
@@ -56,6 +62,33 @@ export default function MyRecipes() {
             ...newRecipe,
         }]);
         setAddRecipeVisible(false);
+    };
+
+    const addToKitchen = (recipe: Recipe) => {
+        if (!kitchenRecipes.some(r => r.id === recipe.id)) {
+            setKitchenRecipes(prev => [...prev, { ...recipe }]);
+        }
+    };
+
+    const handleRecipePress = (recipe: Recipe) => {
+        setSelectedRecipe(recipe);
+    };
+
+    const removeRecipe = (recipeId: string) => {
+        setRecipes(prevRecipes => 
+            prevRecipes.filter(recipe => recipe.id !== recipeId)
+        );
+    };
+
+    const renderRightActions = (recipeId: string) => {
+        return (
+            <TouchableOpacity
+                style={styles.deleteAction}
+                onPress={() => removeRecipe(recipeId)}
+            >
+                <MaterialIcons name="delete" size={24} color={theme.colors.paper} />
+            </TouchableOpacity>
+        );
     };
 
     const filteredRecipes = recipes.filter(recipe =>
@@ -85,21 +118,29 @@ export default function MyRecipes() {
                 <View style={styles.scrollContainer}>
                     <ScrollView>
                         {filteredRecipes.map((recipe: any) => (
-                            <React.Fragment key={recipe.id}>
-                                <TouchableOpacity 
+                            <Swipeable
+                                key={recipe.id}
+                                renderRightActions={() => renderRightActions(recipe.id)}
+                                rightThreshold={40}
+                            >
+                                <TouchableOpacity
                                     style={styles.recipeCard}
-                                    onPress={() => setVisibleRecipeId(recipe.id)}
+                                    onPress={() => handleRecipePress(recipe)}
                                 >
                                     <Text style={styles.recipeName}>
                                         {recipe.name}
                                     </Text>
+                                    <TouchableOpacity
+                                        style={styles.addButton}
+                                        onPress={(e) => {
+                                            e.stopPropagation();
+                                            addToKitchen(recipe);
+                                        }}
+                                    >
+                                        <IconSymbol name="plus" size={24} color={theme.colors.paper} />
+                                    </TouchableOpacity>
                                 </TouchableOpacity>
-                                <RecipePage
-                                    recipe={recipe}
-                                    visible={visibleRecipeId === recipe.id}
-                                    onClose={() => setVisibleRecipeId(null)}
-                                />
-                            </React.Fragment>
+                            </Swipeable>
                         ))}
                     </ScrollView>
                 </View>
@@ -107,8 +148,15 @@ export default function MyRecipes() {
                 <AddRecipePage
                     visible={isAddRecipeVisible}
                     onClose={() => setAddRecipeVisible(false)}
-                    onSave={handleSaveRecipe}
                 />
+
+                {selectedRecipe && (
+                    <RecipeModal
+                        recipe={selectedRecipe}
+                        visible={selectedRecipe !== null}
+                        onClose={() => setSelectedRecipe(null)}
+                    />
+                )}
             </View>
         </SafeAreaView>
     );
@@ -149,12 +197,10 @@ const styles = StyleSheet.create({
         color: theme.colors.ink,
     },
     addButton: {
-        backgroundColor: theme.colors.accent,
-        padding: theme.spacing.md,
-        borderRadius: theme.borderRadius.md,
-        alignItems: 'center',
-        marginBottom: theme.spacing.md,
-        ...theme.shadows.small,
+        backgroundColor: theme.colors.success,
+        borderRadius: theme.borderRadius.full,
+        padding: 8,
+        marginLeft: theme.spacing.sm,
     },
     addButtonText: {
         color: theme.colors.paper,
@@ -175,21 +221,37 @@ const styles = StyleSheet.create({
         marginBottom: 10,
     },
     recipeCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
         backgroundColor: theme.colors.paperDark,
-        borderRadius: theme.borderRadius.md,
         padding: theme.spacing.md,
+        borderRadius: theme.borderRadius.md,
         marginBottom: theme.spacing.sm,
-        ...theme.shadows.small,
     },
     recipeName: {
         fontSize: 18,
         fontFamily: theme.fonts.script,
         color: theme.colors.ink,
+        flex: 1,
     },
     recipeDescription: {
         fontFamily: theme.fonts.regular,
         fontSize: 14,
         color: theme.colors.ink,
         opacity: 0.8,
+    },
+    recipeInfo: {
+        flex: 1,
+        paddingRight: theme.spacing.sm,
+    },
+    deleteAction: {
+        backgroundColor: theme.colors.error,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 80,
+        height: '100%',
+        borderTopRightRadius: theme.borderRadius.md,
+        borderBottomRightRadius: theme.borderRadius.md,
     },
 });

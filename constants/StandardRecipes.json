@@ -4,25 +4,33 @@
             "id": "pancakes",
             "name": "Pancakes",
             "ingredients": ["flour", "eggs", "milk", "sugar", "butter"],
-            "instructions": "Mix all ingredients and cook on a hot griddle."
+            "instructions": "Mix all ingredients and cook on a hot griddle.",
+            "mealType": "breakfast",
+            "checked": false
         },
         {
             "id": "spaghetti", 
             "name": "Spaghetti",
             "ingredients": ["spaghetti pasta", "ground turkey or beef", "tomato sauce", "onion", "garlic", "olive oil", "parmesan cheese"],
-            "instructions": "Boil pasta. Brown meat with onion and garlic. Add sauce and simmer. Combine and top with cheese."
+            "instructions": "Boil pasta. Brown meat with onion and garlic. Add sauce and simmer. Combine and top with cheese.",
+            "mealType": "dinner",
+            "checked": false
         },
         {
             "id": "tacos",
             "name": "Tacos", 
             "ingredients": ["ground beef", "taco shells", "lettuce", "tomato", "cheese", "taco seasoning", "sour cream"],
-            "instructions": "Brown meat with seasoning. Warm shells. Assemble with toppings."
+            "instructions": "Brown meat with seasoning. Warm shells. Assemble with toppings.",
+            "mealType": "dinner",
+            "checked": false
         },
         {
             "id": "pizza",
             "name": "Pizza",
             "ingredients": ["pizza dough", "tomato sauce", "mozzarella cheese", "pepperoni", "olive oil", "italian herbs"],
-            "instructions": "Stretch dough, add sauce and toppings. Bake at 450°F until crust is golden."
+            "instructions": "Stretch dough, add sauce and toppings. Bake at 450°F until crust is golden.",
+            "mealType": "dinner",
+            "checked": false
         }
     ],
     "kitchenRecipes": [
@@ -31,6 +39,7 @@
             "name": "Pancakes",
             "ingredients": ["flour", "eggs", "milk", "sugar", "butter"],
             "instructions": "Mix all ingredients and cook on a hot griddle.",
+            "mealType": "breakfast",
             "checked": false
         },
         {
@@ -38,6 +47,7 @@
             "name": "Spaghetti", 
             "ingredients": ["spaghetti pasta", "ground turkey or beef", "tomato sauce", "onion", "garlic", "olive oil", "parmesan cheese"],
             "instructions": "Boil pasta. Brown meat with onion and garlic. Add sauce and simmer. Combine and top with cheese.",
+            "mealType": "dinner",
             "checked": false
         },
         {
@@ -45,6 +55,7 @@
             "name": "Tacos",
             "ingredients": ["ground beef", "taco shells", "lettuce", "tomato", "cheese", "taco seasoning", "sour cream"],
             "instructions": "Brown meat with seasoning. Warm shells. Assemble with toppings.",
+            "mealType": "dinner",
             "checked": false
         },
         {
@@ -52,6 +63,7 @@
             "name": "Pizza",
             "ingredients": ["pizza dough", "tomato sauce", "mozzarella cheese", "pepperoni", "olive oil", "italian herbs"],
             "instructions": "Stretch dough, add sauce and toppings. Bake at 450°F until crust is golden.",
+            "mealType": "dinner",
             "checked": false
         }
     ]

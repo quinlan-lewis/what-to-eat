@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { 
     StyleSheet, 
     Text, 
@@ -12,52 +12,62 @@ import {
 } from 'react-native';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { theme } from '@/constants/theme';
+import { RecipesContext } from '../../app/(tabs)/_layout';
+import { Recipe, MealType } from '../../types/Recipe';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Swipeable } from 'react-native-gesture-handler';
 
-type AddRecipePageProps = {
+interface Props {
     visible: boolean;
     onClose: () => void;
-    onSave: (recipe: {
-        name: string;
-        ingredients: string[];
-        instructions: string;
-    }) => void;
 }
 
-export const AddRecipePage: React.FC<AddRecipePageProps> = ({ visible, onClose, onSave }) => {
-    const [name, setName] = useState('');
-    const [currentIngredient, setCurrentIngredient] = useState('');
-    const [ingredients, setIngredients] = useState<string[]>([]);
+export const AddRecipePage: React.FC<Props> = ({ visible, onClose }) => {
+    const { recipes, setRecipes } = useContext(RecipesContext);
+    const [recipeName, setRecipeName] = useState('');
+    const [ingredients, setIngredients] = useState<string[]>(['']);
     const [instructions, setInstructions] = useState('');
+    const [selectedMealType, setSelectedMealType] = useState<MealType>('dinner');
 
-    const addIngredient = () => {
-        if (currentIngredient.trim()) {
-            setIngredients([...ingredients, currentIngredient.trim()]);
-            setCurrentIngredient('');
-        }
-    };
-
-    const removeIngredient = (index: number) => {
-        setIngredients(ingredients.filter((_, i) => i !== index));
-    };
+    const mealTypes: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
 
     const handleSave = () => {
-        if (name.trim() && ingredients.length > 0 && instructions.trim()) {
-            onSave({
-                name: name.trim(),
-                ingredients,
-                instructions: instructions.trim()
-            });
-            // Reset form
-            setName('');
-            setIngredients([]);
-            setInstructions('');
-            onClose();
-        }
+        if (recipeName.trim() === '') return;
+
+        const newRecipe: Recipe = {
+            id: Date.now().toString(),
+            name: recipeName,
+            ingredients: ingredients.filter(i => i.trim() !== ''),
+            instructions: instructions.trim(),
+            mealType: selectedMealType,
+            checked: false
+        };
+
+        setRecipes(prevRecipes => [...prevRecipes, newRecipe]);
+        resetForm();
+        onClose();
+    };
+
+    const resetForm = () => {
+        setRecipeName('');
+        setIngredients(['']);
+        setInstructions('');
+        setSelectedMealType('dinner');
+    };
+
+    const addIngredient = () => {
+        setIngredients([...ingredients, '']);
+    };
+
+    const updateIngredient = (text: string, index: number) => {
+        const newIngredients = [...ingredients];
+        newIngredients[index] = text;
+        setIngredients(newIngredients);
     };
 
     return (
         <Modal
-            animationType="fade"
+            animationType="slide"
             transparent={true}
             visible={visible}
             onRequestClose={onClose}
@@ -81,8 +91,8 @@ export const AddRecipePage: React.FC<AddRecipePageProps> = ({ visible, onClose, 
                                 <Text style={styles.sectionTitle}>Recipe Name</Text>
                                 <TextInput
                                     style={styles.input}
-                                    value={name}
-                                    onChangeText={setName}
+                                    value={recipeName}
+                                    onChangeText={setRecipeName}
                                     placeholder="Enter recipe name"
                                 />
                             </View>
@@ -92,8 +102,8 @@ export const AddRecipePage: React.FC<AddRecipePageProps> = ({ visible, onClose, 
                                 <View style={styles.ingredientInput}>
                                     <TextInput
                                         style={[styles.input, { flex: 1 }]}
-                                        value={currentIngredient}
-                                        onChangeText={setCurrentIngredient}
+                                        value={ingredients[0]}
+                                        onChangeText={(text) => updateIngredient(text, 0)}
                                         placeholder="Add an ingredient"
                                         onSubmitEditing={addIngredient}
                                     />
@@ -107,7 +117,7 @@ export const AddRecipePage: React.FC<AddRecipePageProps> = ({ visible, onClose, 
                                 {ingredients.map((ingredient, index) => (
                                     <View key={index} style={styles.ingredientItem}>
                                         <Text style={styles.listItem}>• {ingredient}</Text>
-                                        <TouchableOpacity onPress={() => removeIngredient(index)}>
+                                        <TouchableOpacity onPress={() => updateIngredient('', index)}>
                                             <Text style={styles.removeText}>Remove</Text>
                                         </TouchableOpacity>
                                     </View>
@@ -120,18 +130,42 @@ export const AddRecipePage: React.FC<AddRecipePageProps> = ({ visible, onClose, 
                                     style={[styles.input, styles.instructionsInput]}
                                     value={instructions}
                                     onChangeText={setInstructions}
-                                    placeholder="Enter cooking instructions"
+                                    placeholder="Enter preparation instructions"
                                     multiline
                                     numberOfLines={4}
+                                    textAlignVertical="top"
                                 />
                             </View>
 
-                            <TouchableOpacity 
-                                style={styles.saveButton}
-                                onPress={handleSave}
-                            >
-                                <Text style={styles.saveButtonText}>Save Recipe</Text>
-                            </TouchableOpacity>
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>Meal Type</Text>
+                                <View style={styles.mealTypeSelector}>
+                                    {mealTypes.map((mealType) => (
+                                        <TouchableOpacity
+                                            key={mealType}
+                                            style={selectedMealType === mealType ? styles.selectedMealType : styles.mealType}
+                                            onPress={() => setSelectedMealType(mealType)}
+                                        >
+                                            <Text style={styles.mealTypeText}>{mealType.charAt(0).toUpperCase() + mealType.slice(1)}</Text>
+                                        </TouchableOpacity>
+                                    ))}
+                                </View>
+                            </View>
+
+                            <View style={styles.buttonContainer}>
+                                <TouchableOpacity 
+                                    style={[styles.button, styles.cancelButton]}
+                                    onPress={onClose}
+                                >
+                                    <Text style={styles.buttonText}>Cancel</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity 
+                                    style={[styles.button, styles.saveButton]}
+                                    onPress={handleSave}
+                                >
+                                    <Text style={styles.buttonText}>Save Recipe</Text>
+                                </TouchableOpacity>
+                            </View>
                         </ScrollView>
                     </View>
                 </View>
@@ -231,20 +265,43 @@ const styles = StyleSheet.create({
         fontSize: 14,
         paddingHorizontal: theme.spacing.sm,
     },
-    instructionsInput: {
-        height: 120,
-        textAlignVertical: 'top',
+    mealTypeSelector: {
+        flexDirection: 'row',
+        gap: theme.spacing.sm,
+    },
+    mealType: {
+        padding: theme.spacing.md,
+        borderRadius: theme.borderRadius.md,
+        backgroundColor: theme.colors.subtle,
+    },
+    mealTypeText: {
+        fontSize: 16,
+        fontFamily: theme.fonts.regular,
+        color: theme.colors.ink,
+    },
+    selectedMealType: {
+        padding: theme.spacing.md,
+        borderRadius: theme.borderRadius.md,
+        backgroundColor: theme.colors.accent,
+    },
+    buttonContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: theme.spacing.lg,
+    },
+    button: {
+        padding: theme.spacing.md,
+        borderRadius: theme.borderRadius.md,
+        backgroundColor: theme.colors.subtle,
+        ...theme.shadows.small,
+    },
+    cancelButton: {
+        backgroundColor: theme.colors.error,
     },
     saveButton: {
         backgroundColor: theme.colors.accent,
-        padding: theme.spacing.md,
-        borderRadius: theme.borderRadius.md,
-        alignItems: 'center',
-        marginTop: theme.spacing.lg,
-        marginBottom: theme.spacing.xl,
-        ...theme.shadows.medium,
     },
-    saveButtonText: {
+    buttonText: {
         color: theme.colors.paper,
         fontSize: 18,
         fontFamily: theme.fonts.script,
@@ -259,5 +316,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         ...theme.shadows.small,
+    },
+    instructionsInput: {
+        height: 100,
+        textAlignVertical: 'top',
+        paddingTop: 8,
     },
 });

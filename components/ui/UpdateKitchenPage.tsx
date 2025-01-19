@@ -8,13 +8,15 @@ import {
     Modal, 
     TouchableOpacity, 
     Modal as RNModal,
-    Alert
+    Alert,
+    TextInput
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { RecipesContext, KitchenContext } from '@/app/(tabs)/_layout';
 import { theme } from '@/constants/theme';
 import { SearchBar } from './SearchBar';
+import { Recipe, MealType } from '@/types/Recipe';
 
 type UpdateKitchenPageProps = {
     visible: boolean;
@@ -24,11 +26,14 @@ type UpdateKitchenPageProps = {
 export const UpdateKitchenPage: React.FC<UpdateKitchenPageProps> = ({ visible, onClose }) => {
     const { recipes } = useContext(RecipesContext);
     const { kitchenRecipes, setKitchenRecipes } = useContext(KitchenContext);
-    const [selectedRecipes, setSelectedRecipes] = useState<any[]>([]);
+    const [selectedRecipes, setSelectedRecipes] = useState<Recipe[]>([]);
     const [showRandomOptions, setShowRandomOptions] = useState(false);
     const [selectedNumber, setSelectedNumber] = useState(3);
     const [searchQuery, setSearchQuery] = useState('');
     const [showWarning, setShowWarning] = useState(false);
+    const [recipeName, setRecipeName] = useState('');
+    const [ingredients, setIngredients] = useState<string[]>(['']);
+    const [selectedMealType, setSelectedMealType] = useState<MealType>('dinner');
 
     useEffect(() => {
         if (visible) {
@@ -40,19 +45,9 @@ export const UpdateKitchenPage: React.FC<UpdateKitchenPageProps> = ({ visible, o
         return selectedRecipes.some(recipe => recipe.id === recipeId);
     };
 
-    const toggleRecipeSelection = (recipe: any) => {
-        if (isSelected(recipe.id)) {
-            setSelectedRecipes(prev => 
-                prev.filter(selectedRecipe => selectedRecipe.id !== recipe.id)
-            );
-            setShowWarning(false);
-        } else {
-            if (selectedRecipes.length >= selectedNumber) {
-                setShowWarning(true);
-                return;
-            }
-            setSelectedRecipes(prev => [...prev, { ...recipe, checked: false }]);
-        }
+    const toggleRecipeCheck = (recipeId: string) => {
+        const updatedRecipes = kitchenRecipes.filter(recipe => recipe.id !== recipeId);
+        setKitchenRecipes(updatedRecipes);
     };
 
     const handleSave = () => {
@@ -89,6 +84,50 @@ export const UpdateKitchenPage: React.FC<UpdateKitchenPageProps> = ({ visible, o
         setShowWarning(false);
     };
 
+    const mealTypes: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack'];
+
+    const addRecipe = () => {
+        if (recipeName.trim() === '') return;
+
+        const newRecipe: Recipe = {
+            id: Date.now().toString(),
+            name: recipeName,
+            ingredients: ingredients.filter(i => i.trim() !== ''),
+            instructions: '',
+            mealType: selectedMealType,
+            checked: false
+        };
+
+        setKitchenRecipes(prevRecipes => [...prevRecipes, newRecipe]);
+        resetForm();
+        onClose();
+    };
+
+    const resetForm = () => {
+        setRecipeName('');
+        setIngredients(['']);
+        setSelectedMealType('dinner');
+    };
+
+    const addIngredient = () => {
+        setIngredients([...ingredients, '']);
+    };
+
+    const updateIngredient = (text: string, index: number) => {
+        const newIngredients = [...ingredients];
+        newIngredients[index] = text;
+        setIngredients(newIngredients);
+    };
+
+    const toggleRecipeSelection = (recipe: Recipe) => {
+        const isSelected = selectedRecipes.some(r => r.id === recipe.id);
+        if (isSelected) {
+            setSelectedRecipes(selectedRecipes.filter(r => r.id !== recipe.id));
+        } else {
+            setSelectedRecipes([...selectedRecipes, recipe]);
+        }
+    };
+
     return (
         <Modal
             animationType="fade"
@@ -123,7 +162,7 @@ export const UpdateKitchenPage: React.FC<UpdateKitchenPageProps> = ({ visible, o
                                     <Text style={styles.recipeName}>{recipe.name}</Text>
                                     {isSelected(recipe.id) && (
                                         <IconSymbol 
-                                            name="checkmark" 
+                                            name="xmark" 
                                             size={20} 
                                             color={theme.colors.success} 
                                         />

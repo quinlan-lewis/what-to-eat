@@ -2,28 +2,38 @@ import React, { useContext, useState } from 'react';
 import { StyleSheet, Text, View, ScrollView, SafeAreaView, Pressable, TouchableOpacity } from 'react-native';
 import { KitchenContext } from './_layout';
 import { RecipePage } from '@/components/ui/RecipePage';
-import { IngredientListModal } from '@/components/ui/IngredientListModal';
-import { UpdateKitchenPage } from '@/components/ui/UpdateKitchenPage';
-import { theme } from '@/constants/theme';
+import { IngredientListModal } from '../../components/ui/IngredientListModal';
+import { RecipeModal } from '../../components/ui/RecipeModal';
+import { theme } from '../../constants/theme';
+import { Recipe, MealType } from '../../types/Recipe';
+import * as Clipboard from 'expo-clipboard';
+import { Swipeable } from 'react-native-gesture-handler';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 export default function MyKitchen() {
     const { kitchenRecipes, setKitchenRecipes } = useContext(KitchenContext);
-    const [visibleRecipeId, setVisibleRecipeId] = useState<string | null>(null);
+    const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
     const [showIngredients, setShowIngredients] = useState(false);
-    const [showUpdateKitchen, setShowUpdateKitchen] = useState(false);
-    
-    const toggleRecipeChecked = (recipeId: string) => {
-        setKitchenRecipes(prevRecipes => {
-            const updatedRecipes = prevRecipes.map(recipe => 
-                recipe.id === recipeId 
-                    ? { ...recipe, checked: !recipe.checked }
-                    : recipe
-            );
-            return updatedRecipes.sort((a, b) => {
-                if (a.checked === b.checked) return 0;
-                return a.checked ? 1 : -1;
-            });
-        });
+
+    const handleRecipePress = (recipe: Recipe) => {
+        setSelectedRecipe(recipe);
+    };
+
+    const removeRecipe = (recipeId: string) => {
+        setKitchenRecipes(prevRecipes => 
+            prevRecipes.filter(recipe => recipe.id !== recipeId)
+        );
+    };
+
+    const renderRightActions = (recipeId: string) => {
+        return (
+            <TouchableOpacity
+                style={styles.deleteAction}
+                onPress={() => removeRecipe(recipeId)}
+            >
+                <MaterialIcons name="delete" size={24} color={theme.colors.paper} />
+            </TouchableOpacity>
+        );
     };
 
     return (
@@ -32,13 +42,6 @@ export default function MyKitchen() {
                 <Text style={styles.title}>My Kitchen</Text>
                 
                 <View style={styles.buttonContainer}>
-                    <TouchableOpacity 
-                        style={[styles.button, styles.updateButton]}
-                        onPress={() => setShowUpdateKitchen(true)}
-                    >
-                        <Text style={styles.buttonText}>Update Kitchen</Text>
-                    </TouchableOpacity>
-                    
                     <TouchableOpacity 
                         style={[styles.button, styles.ingredientsButton]}
                         onPress={() => setShowIngredients(true)}
@@ -49,56 +52,36 @@ export default function MyKitchen() {
 
                 <View style={styles.scrollContainer}>
                     <ScrollView>
-                        {kitchenRecipes.map((recipe: any) => (
-                            <React.Fragment key={recipe.id}>
+                        {kitchenRecipes.map((recipe) => (
+                            <Swipeable
+                                key={recipe.id}
+                                renderRightActions={() => renderRightActions(recipe.id)}
+                                rightThreshold={40}
+                            >
                                 <TouchableOpacity 
-                                    style={[
-                                        styles.recipeCard,
-                                        recipe.checked && styles.checkedCard
-                                    ]}
-                                    onPress={() => setVisibleRecipeId(recipe.id)}
+                                    style={styles.recipeCard}
+                                    onPress={() => handleRecipePress(recipe)}
                                 >
-                                    <View style={styles.recipeRow}>
-                                        <Pressable
-                                            onPress={(e) => {
-                                                e.stopPropagation();
-                                                toggleRecipeChecked(recipe.id);
-                                            }}
-                                            style={styles.checkbox}>
-                                            {recipe.checked ? <Text>✓</Text> : null}
-                                        </Pressable>
-                                        <Text
-                                            style={[
-                                                styles.recipeName,
-                                                recipe.checked && styles.checkedText
-                                            ]}>
-                                            {recipe.name}
-                                        </Text>
-                                    </View>
+                                    <Text style={styles.recipeName}>{recipe.name}</Text>
                                 </TouchableOpacity>
-                                <RecipePage
-                                    recipe={recipe}
-                                    visible={visibleRecipeId === recipe.id}
-                                    onClose={() => setVisibleRecipeId(null)}
-                                />
-                            </React.Fragment>
+                            </Swipeable>
                         ))}
                     </ScrollView>
                 </View>
 
-                <UpdateKitchenPage
-                    visible={showUpdateKitchen}
-                    onClose={() => setShowUpdateKitchen(false)}
-                />
+                {selectedRecipe && (
+                    <RecipeModal
+                        recipe={selectedRecipe}
+                        visible={selectedRecipe !== null}
+                        onClose={() => setSelectedRecipe(null)}
+                    />
+                )}
 
                 <IngredientListModal
                     visible={showIngredients}
                     onClose={() => setShowIngredients(false)}
                     recipes={kitchenRecipes}
                 />
-
-                <Text style={{ fontFamily: 'Satisfy' }}>Testing Satisfy Font</Text>
-                <Text style={{ fontFamily: 'Lora' }}>Testing Lora Font</Text>
             </View>
         </SafeAreaView>
     );
@@ -167,9 +150,6 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
     },
-    updateButton: {
-        backgroundColor: theme.colors.accent,
-    },
     ingredientsButton: {
         backgroundColor: theme.colors.secondary,
     },
@@ -189,5 +169,56 @@ const styles = StyleSheet.create({
     checkedCard: {
         backgroundColor: theme.colors.subtle,
         opacity: 0.8,
+    },
+    weekSection: {
+        marginBottom: theme.spacing.md,
+    },
+    weekHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: theme.spacing.sm,
+    },
+    weekTitle: {
+        fontSize: 24,
+        fontFamily: theme.fonts.script,
+        color: theme.colors.ink,
+    },
+    randomizeButton: {
+        backgroundColor: theme.colors.accent,
+    },
+    dayCard: {
+        width: 280,
+        backgroundColor: theme.colors.paperDark,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.md,
+        marginRight: theme.spacing.md,
+    },
+    dayTitle: {
+        fontSize: 20,
+        fontFamily: theme.fonts.script,
+        color: theme.colors.ink,
+        marginBottom: theme.spacing.sm,
+    },
+    mealSlot: {
+        backgroundColor: theme.colors.paper,
+        borderRadius: theme.borderRadius.sm,
+        padding: theme.spacing.sm,
+        marginBottom: theme.spacing.xs,
+    },
+    mealType: {
+        fontSize: 14,
+        fontFamily: theme.fonts.script,
+        color: theme.colors.secondary,
+        marginBottom: theme.spacing.xs,
+    },
+    deleteAction: {
+        backgroundColor: theme.colors.error,
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 80,
+        height: '100%',
+        borderTopRightRadius: theme.borderRadius.md,
+        borderBottomRightRadius: theme.borderRadius.md,
     },
 });

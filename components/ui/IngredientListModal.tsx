@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Modal, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, Modal, ScrollView, TouchableOpacity, SafeAreaView, Clipboard } from 'react-native';
 import { IconSymbol } from './IconSymbol';
 import { theme } from '@/constants/theme';
 
@@ -11,6 +11,20 @@ type IngredientListModalProps = {
 
 export const IngredientListModal: React.FC<IngredientListModalProps> = ({ visible, onClose, recipes }) => {
     const uncheckedRecipes = recipes.filter(recipe => !recipe.checked);
+    
+    const copyToClipboard = () => {
+        let clipboardText = 'Shopping List:\n\n';
+        
+        uncheckedRecipes.forEach(recipe => {
+            clipboardText += `${recipe.name}:\n`;
+            recipe.ingredients.forEach((ingredient: string) => {
+                clipboardText += `• ${ingredient}\n`;
+            });
+            clipboardText += '\n';
+        });
+        
+        Clipboard.setString(clipboardText);
+    };
     
     return (
         <Modal
@@ -31,6 +45,14 @@ export const IngredientListModal: React.FC<IngredientListModalProps> = ({ visibl
                                 <IconSymbol name="chevron.left" size={24} color={theme.colors.ink} />
                             </TouchableOpacity>
                             <Text style={styles.title}>Shopping List</Text>
+                            {uncheckedRecipes.length > 0 && (
+                                <TouchableOpacity 
+                                    onPress={copyToClipboard}
+                                    style={styles.copyButton}
+                                >
+                                    <IconSymbol name="text.book.closed" size={20} color={theme.colors.ink} />
+                                </TouchableOpacity>
+                            )}
                         </View>
 
                         <ScrollView style={styles.scrollContainer}>
@@ -93,6 +115,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         ...theme.shadows.small,
+    },
+    copyButton: {
+        padding: theme.spacing.md,
+        marginRight: -theme.spacing.sm,
+        backgroundColor: theme.colors.paperDark,
+        borderRadius: theme.borderRadius.full,
+        width: 44,
+        height: 44,
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...theme.shadows.small,
+        position: 'absolute',
+        right: 0,
     },
     title: {
         flex: 1,
