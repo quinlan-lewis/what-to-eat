@@ -4,6 +4,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { SymbolWeight } from 'expo-symbols';
 import React from 'react';
 import { OpaqueColorValue, StyleProp, TextStyle } from 'react-native';
+import { SFSymbol } from 'react-native-sfsymbols';
 
 // Add your SFSymbol to MaterialIcons mappings here.
 const MAPPING = {
@@ -17,9 +18,27 @@ const MAPPING = {
   'xmark': 'close',
   'magnifyingglass': 'search',
   'plus': 'add',
+  'calendar': 'event',
 } as const;
 
 export type IconSymbolName = keyof typeof MAPPING;
+
+type IconName = 
+    | 'refrigerator'
+    | 'text.book.closed'
+    | 'questionmark'
+    | 'chevron.left'
+    | 'chevron.right'
+    | 'xmark'
+    | 'magnifyingglass'
+    | 'plus'
+    | 'calendar';  // Added calendar
+
+interface IconSymbolProps {
+    name: IconName;
+    size?: number;
+    color?: string;
+}
 
 /**
  * An icon component that uses native SFSymbols on iOS, and MaterialIcons on Android and web. This ensures a consistent look across platforms, and optimal resource usage.

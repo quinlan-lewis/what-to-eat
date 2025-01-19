@@ -1,27 +1,23 @@
 import React from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { IconSymbol } from './IconSymbol';
+import { theme } from '@/constants/theme';
 
 type SearchBarProps = {
     value: string;
     onChangeText: (text: string) => void;
-    placeholder?: string;
-};
+}
 
-export const SearchBar: React.FC<SearchBarProps> = ({ 
-    value, 
-    onChangeText, 
-    placeholder = "Search recipes..." 
-}) => {
+export const SearchBar: React.FC<SearchBarProps> = ({ value, onChangeText }) => {
     return (
         <View style={styles.container}>
-            <IconSymbol name="magnifyingglass" size={20} color="#666" />
+            <IconSymbol name="magnifyingglass" size={20} color={theme.colors.ink} />
             <TextInput
                 style={styles.input}
                 value={value}
                 onChangeText={onChangeText}
-                placeholder={placeholder}
-                placeholderTextColor="#666"
+                placeholder="Search recipes..."
+                placeholderTextColor={theme.colors.secondary}
             />
         </View>
     );
@@ -31,16 +27,16 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f0f0f0',
-        borderRadius: 10,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
-        marginBottom: 16,
+        backgroundColor: theme.colors.paper,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.sm,
+        ...theme.shadows.small,
     },
     input: {
         flex: 1,
-        marginLeft: 8,
+        marginLeft: theme.spacing.sm,
         fontSize: 16,
-        color: '#000',
+        fontFamily: theme.fonts.regular,
+        color: theme.colors.ink,
     },
 });
