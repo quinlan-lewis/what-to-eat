@@ -73,8 +73,15 @@ const styles = StyleSheet.create({
         ...theme.shadows.medium,
     },
     backButton: {
-        padding: theme.spacing.sm,
+        padding: theme.spacing.md,
         marginLeft: -theme.spacing.sm,
+        backgroundColor: theme.colors.paperDark,
+        borderRadius: theme.borderRadius.full,
+        width: 44,
+        height: 44,
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...theme.shadows.small,
     },
     innerContainer: {
         flex: 1,

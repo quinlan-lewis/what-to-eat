@@ -1,15 +1,7 @@
 import React from 'react';
-import { 
-    StyleSheet, 
-    Text, 
-    View, 
-    Modal, 
-    SafeAreaView, 
-    TouchableOpacity, 
-    ScrollView,
-    Share
-} from 'react-native';
+import { StyleSheet, Text, View, Modal, ScrollView, TouchableOpacity, SafeAreaView } from 'react-native';
 import { IconSymbol } from './IconSymbol';
+import { theme } from '@/constants/theme';
 
 type IngredientListModalProps = {
     visible: boolean;
@@ -17,56 +9,51 @@ type IngredientListModalProps = {
     recipes: any[];
 }
 
-export const IngredientListModal: React.FC<IngredientListModalProps> = ({ 
-    visible, 
-    onClose, 
-    recipes 
-}) => {
-    const allIngredients = recipes.reduce((acc: string[], recipe) => {
-        return [...acc, ...recipe.ingredients];
-    }, []);
-
-    const shareIngredients = async () => {
-        try {
-            const message = `Shopping List:\n\n${allIngredients.map((ing: any) => `• ${ing}`).join('\n')}`;
-            await Share.share({
-                message,
-            });
-        } catch (error) {
-            console.error('Error sharing ingredients:', error);
-        }
-    };
-
+export const IngredientListModal: React.FC<IngredientListModalProps> = ({ visible, onClose, recipes }) => {
+    const uncheckedRecipes = recipes.filter(recipe => !recipe.checked);
+    
     return (
         <Modal
-            animationType="slide"
+            animationType="fade"
             transparent={true}
             visible={visible}
             onRequestClose={onClose}
+            statusBarTranslucent={true}
         >
-            <SafeAreaView style={styles.container}>
-                <View style={styles.innerContainer}>
-                    <View style={styles.header}>
-                        <TouchableOpacity onPress={onClose}>
-                            <IconSymbol name="chevron.left" size={24} color="black" />
-                        </TouchableOpacity>
-                        <Text style={styles.title}>Shopping List</Text>
+            <SafeAreaView style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                    <View style={styles.innerContainer}>
+                        <View style={styles.header}>
+                            <TouchableOpacity 
+                                onPress={onClose}
+                                style={styles.backButton}
+                            >
+                                <IconSymbol name="chevron.left" size={24} color={theme.colors.ink} />
+                            </TouchableOpacity>
+                            <Text style={styles.title}>Shopping List</Text>
+                        </View>
+
+                        <ScrollView style={styles.scrollContainer}>
+                            {uncheckedRecipes.map((recipe, index) => (
+                                <View key={recipe.id} style={styles.recipeSection}>
+                                    <Text style={styles.recipeName}>{recipe.name}</Text>
+                                    <View style={styles.ingredientsContainer}>
+                                        {recipe.ingredients.map((ingredient: string, i: number) => (
+                                            <View key={i} style={styles.ingredientItem}>
+                                                <Text style={styles.ingredientText}>• {ingredient}</Text>
+                                            </View>
+                                        ))}
+                                    </View>
+                                </View>
+                            ))}
+                            
+                            {uncheckedRecipes.length === 0 && (
+                                <View style={styles.emptyContainer}>
+                                    <Text style={styles.emptyText}>No ingredients needed!</Text>
+                                </View>
+                            )}
+                        </ScrollView>
                     </View>
-
-                    <ScrollView style={styles.scrollContainer}>
-                        {allIngredients.map((ingredient:any, index:any) => (
-                            <Text key={index} style={styles.ingredient}>
-                                • {ingredient}
-                            </Text>
-                        ))}
-                    </ScrollView>
-
-                    <TouchableOpacity 
-                        style={styles.shareButton}
-                        onPress={shareIngredients}
-                    >
-                        <Text style={styles.shareButtonText}>Share List</Text>
-                    </TouchableOpacity>
                 </View>
             </SafeAreaView>
         </Modal>
@@ -74,49 +61,89 @@ export const IngredientListModal: React.FC<IngredientListModalProps> = ({
 };
 
 const styles = StyleSheet.create({
-    container: {
+    modalOverlay: {
         flex: 1,
-        backgroundColor: 'white',
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    },
+    modalContent: {
+        flex: 1,
+        backgroundColor: theme.colors.paper,
+        marginTop: 50,
+        borderTopLeftRadius: theme.borderRadius.lg,
+        borderTopRightRadius: theme.borderRadius.lg,
+        ...theme.shadows.medium,
     },
     innerContainer: {
         flex: 1,
-        padding: 20,
+        padding: theme.spacing.md,
     },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: theme.spacing.lg,
         position: 'relative',
     },
+    backButton: {
+        padding: theme.spacing.md,
+        marginLeft: -theme.spacing.sm,
+        backgroundColor: theme.colors.paperDark,
+        borderRadius: theme.borderRadius.full,
+        width: 44,
+        height: 44,
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...theme.shadows.small,
+    },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: 'black',
-        position: 'absolute',
-        left: 0,
-        right: 0,
+        flex: 1,
+        fontSize: 28,
+        fontFamily: theme.fonts.script,
+        color: theme.colors.ink,
         textAlign: 'center',
-        zIndex: -1,
+        marginLeft: -24,
     },
     scrollContainer: {
         flex: 1,
     },
-    ingredient: {
+    recipeSection: {
+        backgroundColor: theme.colors.paperDark,
+        borderRadius: theme.borderRadius.md,
+        padding: theme.spacing.md,
+        marginBottom: theme.spacing.md,
+        ...theme.shadows.small,
+    },
+    recipeName: {
+        fontSize: 20,
+        fontFamily: theme.fonts.script,
+        color: theme.colors.ink,
+        marginBottom: theme.spacing.sm,
+    },
+    ingredientsContainer: {
+        backgroundColor: theme.colors.paper,
+        borderRadius: theme.borderRadius.sm,
+        padding: theme.spacing.sm,
+    },
+    ingredientItem: {
+        marginBottom: theme.spacing.xs,
+    },
+    ingredientText: {
         fontSize: 16,
-        color: 'black',
-        marginBottom: 10,
-        paddingHorizontal: 10,
+        fontFamily: theme.fonts.regular,
+        color: theme.colors.ink,
+        lineHeight: 24,
     },
-    shareButton: {
-        backgroundColor: '#007AFF',
-        padding: 16,
-        borderRadius: 8,
+    emptyContainer: {
+        padding: theme.spacing.xl,
         alignItems: 'center',
-        marginTop: 20,
+        justifyContent: 'center',
+        backgroundColor: theme.colors.paperDark,
+        borderRadius: theme.borderRadius.md,
+        ...theme.shadows.small,
     },
-    shareButtonText: {
-        color: 'white',
+    emptyText: {
         fontSize: 18,
-        fontWeight: 'bold',
+        fontFamily: theme.fonts.script,
+        color: theme.colors.secondary,
+        textAlign: 'center',
     },
 }); 

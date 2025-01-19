@@ -61,73 +61,79 @@ export const AddRecipePage: React.FC<AddRecipePageProps> = ({ visible, onClose, 
             transparent={true}
             visible={visible}
             onRequestClose={onClose}
+            statusBarTranslucent={true}
         >
-            <SafeAreaView style={styles.modalContainer}>
-                <View style={styles.innerContainer}>
-                    <View style={styles.header}>
-                        <TouchableOpacity onPress={onClose}>
-                            <IconSymbol name="chevron.left" size={24} color={theme.colors.ink} />
-                        </TouchableOpacity>
-                        <Text style={styles.title}>Add New Recipe</Text>
-                    </View>
-                    
-                    <ScrollView style={styles.scrollContainer}>
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Recipe Name</Text>
-                            <TextInput
-                                style={styles.input}
-                                value={name}
-                                onChangeText={setName}
-                                placeholder="Enter recipe name"
-                            />
+            <SafeAreaView style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                    <View style={styles.innerContainer}>
+                        <View style={styles.header}>
+                            <TouchableOpacity 
+                                onPress={onClose}
+                                style={styles.backButton}
+                            >
+                                <IconSymbol name="chevron.left" size={24} color={theme.colors.ink} />
+                            </TouchableOpacity>
+                            <Text style={styles.title}>Add New Recipe</Text>
                         </View>
-
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Ingredients</Text>
-                            <View style={styles.ingredientInput}>
+                        
+                        <ScrollView style={styles.scrollContainer}>
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>Recipe Name</Text>
                                 <TextInput
-                                    style={[styles.input, { flex: 1 }]}
-                                    value={currentIngredient}
-                                    onChangeText={setCurrentIngredient}
-                                    placeholder="Add an ingredient"
-                                    onSubmitEditing={addIngredient}
+                                    style={styles.input}
+                                    value={name}
+                                    onChangeText={setName}
+                                    placeholder="Enter recipe name"
                                 />
-                                <TouchableOpacity 
-                                    style={styles.addButton}
-                                    onPress={addIngredient}
-                                >
-                                    <Text style={styles.addButtonText}>Add</Text>
-                                </TouchableOpacity>
                             </View>
-                            {ingredients.map((ingredient, index) => (
-                                <View key={index} style={styles.ingredientItem}>
-                                    <Text style={styles.listItem}>• {ingredient}</Text>
-                                    <TouchableOpacity onPress={() => removeIngredient(index)}>
-                                        <Text style={styles.removeText}>Remove</Text>
+
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>Ingredients</Text>
+                                <View style={styles.ingredientInput}>
+                                    <TextInput
+                                        style={[styles.input, { flex: 1 }]}
+                                        value={currentIngredient}
+                                        onChangeText={setCurrentIngredient}
+                                        placeholder="Add an ingredient"
+                                        onSubmitEditing={addIngredient}
+                                    />
+                                    <TouchableOpacity 
+                                        style={styles.addButton}
+                                        onPress={addIngredient}
+                                    >
+                                        <Text style={styles.addButtonText}>Add</Text>
                                     </TouchableOpacity>
                                 </View>
-                            ))}
-                        </View>
+                                {ingredients.map((ingredient, index) => (
+                                    <View key={index} style={styles.ingredientItem}>
+                                        <Text style={styles.listItem}>• {ingredient}</Text>
+                                        <TouchableOpacity onPress={() => removeIngredient(index)}>
+                                            <Text style={styles.removeText}>Remove</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                ))}
+                            </View>
 
-                        <View style={styles.section}>
-                            <Text style={styles.sectionTitle}>Instructions</Text>
-                            <TextInput
-                                style={[styles.input, styles.instructionsInput]}
-                                value={instructions}
-                                onChangeText={setInstructions}
-                                placeholder="Enter cooking instructions"
-                                multiline
-                                numberOfLines={4}
-                            />
-                        </View>
+                            <View style={styles.section}>
+                                <Text style={styles.sectionTitle}>Instructions</Text>
+                                <TextInput
+                                    style={[styles.input, styles.instructionsInput]}
+                                    value={instructions}
+                                    onChangeText={setInstructions}
+                                    placeholder="Enter cooking instructions"
+                                    multiline
+                                    numberOfLines={4}
+                                />
+                            </View>
 
-                        <TouchableOpacity 
-                            style={styles.saveButton}
-                            onPress={handleSave}
-                        >
-                            <Text style={styles.saveButtonText}>Save Recipe</Text>
-                        </TouchableOpacity>
-                    </ScrollView>
+                            <TouchableOpacity 
+                                style={styles.saveButton}
+                                onPress={handleSave}
+                            >
+                                <Text style={styles.saveButtonText}>Save Recipe</Text>
+                            </TouchableOpacity>
+                        </ScrollView>
+                    </View>
                 </View>
             </SafeAreaView>
         </Modal>
@@ -135,10 +141,17 @@ export const AddRecipePage: React.FC<AddRecipePageProps> = ({ visible, onClose, 
 };
 
 const styles = StyleSheet.create({
-    modalContainer: {
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    },
+    modalContent: {
         flex: 1,
         backgroundColor: theme.colors.paper,
-        padding: theme.spacing.md,
+        marginTop: 50,
+        borderTopLeftRadius: theme.borderRadius.lg,
+        borderTopRightRadius: theme.borderRadius.lg,
+        ...theme.shadows.medium,
     },
     innerContainer: {
         flex: 1,
@@ -151,11 +164,12 @@ const styles = StyleSheet.create({
         position: 'relative',
     },
     title: {
+        flex: 1,
         fontSize: 28,
         fontFamily: theme.fonts.script,
         color: theme.colors.ink,
-        marginBottom: theme.spacing.lg,
         textAlign: 'center',
+        marginLeft: -24,  // Compensate for back button to center title
     },
     scrollContainer: {
         flex: 1,
@@ -234,5 +248,16 @@ const styles = StyleSheet.create({
         color: theme.colors.paper,
         fontSize: 18,
         fontFamily: theme.fonts.script,
+    },
+    backButton: {
+        padding: theme.spacing.md,
+        marginLeft: -theme.spacing.sm,
+        backgroundColor: theme.colors.paperDark,
+        borderRadius: theme.borderRadius.full,
+        width: 44,
+        height: 44,
+        alignItems: 'center',
+        justifyContent: 'center',
+        ...theme.shadows.small,
     },
 });
